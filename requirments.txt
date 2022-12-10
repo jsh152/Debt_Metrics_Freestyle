@@ -1,0 +1,9 @@
+#This is the requirements.txt file
+
+pandas
+
+requests
+
+plotly
+
+json
