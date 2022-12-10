@@ -3,55 +3,65 @@
 
 import requests
 import json
-
-from getpass import getpass
-
+from app.alpha import get_symbol
 from app.alpha import API_KEY
 
-stock_symbol = input("Please enter the ticker symbol of the business that you would like to analyze.")
+def fetch_balance_data(symbol):
 
-balance_url = f"https://www.alphavantage.co/query?function=BALANCE_SHEET&symbol={stock_symbol}&apikey={API_KEY}"
+    balance_url = f"https://www.alphavantage.co/query?function=BALANCE_SHEET&symbol={symbol}&apikey={API_KEY}"
 
-raw_balance_data = requests.get(balance_url)
+    raw_balance_data = requests.get(balance_url)
 
-parsed_balance_data = json.loads(raw_balance_data.text)
+    parsed_balance_data = json.loads(raw_balance_data.text)
 
-statements_date = parsed_balance_data['annualReports'][0]['fiscalDateEnding']
-
-shortterm_debt = float(parsed_balance_data['annualReports'][0]['shortTermDebt'])
-
-longterm_debt = float(parsed_balance_data['annualReports'][0]['longTermDebtNoncurrent'])
-
-total_debt = shortterm_debt + longterm_debt
+    return parsed_balance_data
 
 
-print("As of " + statements_date + " " + stock_symbol + " has:")
+def fetch_income_data(symbol):
 
-print("")
+    income_url = f"https://www.alphavantage.co/query?function=INCOME_STATEMENT&symbol={symbol}&apikey={API_KEY}"
 
-print("Total debt of: $" + str(total_debt / 1000000000) + " billion.")
+    raw_income_data = requests.get(income_url)
 
-total_assets = float(parsed_balance_data['annualReports'][0]['totalAssets'])
+    parsed_income_data = json.loads(raw_income_data.text)
 
-debt_ratio = total_debt / total_assets
+    return parsed_income_data
 
-formatted_debt_ratio = "{:.2f}".format(debt_ratio)
+if __name__ == "__main__":
+    symbol = get_symbol()
 
-print("A debt/asset ratio of: " + formatted_debt_ratio)
+    balance_data = fetch_balance_data(symbol)
 
+    income_data = fetch_income_data(symbol)
 
-income_url = f"https://www.alphavantage.co/query?function=INCOME_STATEMENT&symbol={stock_symbol}&apikey={API_KEY}"
+    statements_date = balance_data['annualReports'][0]['fiscalDateEnding']
 
-raw_income_data = requests.get(income_url)
+    shortterm_debt = float(balance_data['annualReports'][0]['shortTermDebt'])
 
-parsed_income_data = json.loads(raw_income_data.text)
+    longterm_debt = float(balance_data['annualReports'][0]['longTermDebtNoncurrent'])
 
-EBIT = float(parsed_income_data['annualReports'][0]['ebit'])
+    total_debt = shortterm_debt + longterm_debt
 
-interest_expense = float(parsed_income_data['annualReports'][0]['interestExpense'])
+    print("As of " + statements_date + " " + symbol + " has:")
 
-coverage_ratio = EBIT / interest_expense
+    print("")
 
-formatted_coverage_ratio = "{:.2f}".format(coverage_ratio)
+    print("Total debt of: $" + str(total_debt / 1000000000) + " billion.")
 
-print("An interest coverage ratio of: " + formatted_coverage_ratio)
+    total_assets = float(balance_data['annualReports'][0]['totalAssets'])
+
+    debt_ratio = total_debt / total_assets
+
+    formatted_debt_ratio = "{:.2f}".format(debt_ratio)
+
+    print("A debt/asset ratio of: " + formatted_debt_ratio)
+
+    EBIT = float(income_data['annualReports'][0]['ebit'])
+
+    interest_expense = float(income_data['annualReports'][0]['interestExpense'])
+
+    coverage_ratio = EBIT / interest_expense
+
+    formatted_coverage_ratio = "{:.2f}".format(coverage_ratio)
+
+    print("An interest coverage ratio of: " + formatted_coverage_ratio)
