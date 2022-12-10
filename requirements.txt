@@ -5,5 +5,3 @@ pandas
 requests
 
 plotly
-
-getpass
