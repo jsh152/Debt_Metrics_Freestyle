@@ -1,14 +1,12 @@
 #This is the overview file. Here, basic debt metrics will be presented abou the company at a glance
 
-#from app.alpha import get_API
-#from app.alpha import get_symbol
 
-#get_API()
-
-#get_symbol()
+import requests
+import json
 
 from getpass import getpass
-API_KEY = getpass("Please input your AlphaVantage API Key: ") 
+
+from app.alpha import API_KEY
 
 stock_symbol = input("Please enter the ticker symbol of the business that you would like to analyze.")
 
@@ -40,7 +38,6 @@ debt_ratio = total_debt / total_assets
 formatted_debt_ratio = "{:.2f}".format(debt_ratio)
 
 print("A debt/asset ratio of: " + formatted_debt_ratio)
-
 
 
 income_url = f"https://www.alphavantage.co/query?function=INCOME_STATEMENT&symbol={stock_symbol}&apikey={API_KEY}"

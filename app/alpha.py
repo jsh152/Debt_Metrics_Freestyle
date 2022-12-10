@@ -1,13 +1,9 @@
-#This is the alpha file. Get the api key and stock symbol from user
+#This is the alpha file. Get the api key
 
+import os
+from dotenv import load_dotenv
 
-#from getpass import getpass
+load_dotenv()
 
-def get_API():
-    from getpass import getpass
-    API_KEY = getpass("Please input your AlphaVantage API Key: ") 
-
-def get_symbol():
-    stock_symbol = input("Please enter the ticker symbol of the business that you would like to analyze.")
-
+API_KEY = os.getenv("API_KEY")
 
