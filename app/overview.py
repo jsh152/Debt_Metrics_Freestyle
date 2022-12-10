@@ -43,6 +43,13 @@ def calc_total_debt(symbol, balance_data):
 
     return total_debt_amt
 
+
+def format_debt(symbol, balance_data, total_debt):
+    total_debt = calc_total_debt(symbol, balance_data)
+    format_total_debt = str(total_debt / 1000000000) + ' Billion'
+
+    return format_total_debt
+
 def calc_debt_ratio(symbol, balance_data, total_debt):
     total_debt = calc_total_debt(symbol, balance_data)
     
@@ -52,7 +59,9 @@ def calc_debt_ratio(symbol, balance_data, total_debt):
 
     debt_asset_ratio = total_debt / total_assets
 
-    return debt_asset_ratio
+    form_debt_asset_ratio = round(debt_asset_ratio, ndigits=2)
+
+    return form_debt_asset_ratio
 
 def calc_coverage_ratio(symbol,income_data ):
     EBIT = float(income_data['annualReports'][0]['ebit'])
@@ -64,7 +73,9 @@ def calc_coverage_ratio(symbol,income_data ):
 
     int_coverage_ratio = EBIT / interest_expense
 
-    return int_coverage_ratio
+    form_int_coverage_ratio = round(int_coverage_ratio, ndigits=2)
+
+    return form_int_coverage_ratio
 
 
 if __name__ == "__main__":
@@ -73,6 +84,7 @@ if __name__ == "__main__":
         income_data = fetch_income_data(symbol)
         balance_data = fetch_balance_data(symbol)
         total_debt = calc_total_debt(symbol, balance_data)
+        formatted_debt = format_debt(symbol, balance_data, total_debt)
         debt_ratio = calc_debt_ratio(symbol, balance_data, total_debt)
         coverage_ratio = calc_coverage_ratio(symbol, income_data)
 
@@ -84,15 +96,11 @@ if __name__ == "__main__":
 
         print("")
 
-        print("Total debt of: $" + str(total_debt / 1000000000) + " billion.")
+        print("Total debt of: $" + formatted_debt)
 
-        formatted_debt_ratio = "{:.2f}".format(debt_ratio)
+        print("A debt/asset ratio of: " + str(debt_ratio))
 
-        print("A debt/asset ratio of: " + formatted_debt_ratio)
-
-        formatted_coverage_ratio = "{:.2f}".format(coverage_ratio)
-
-        print("An interest coverage ratio of: " + formatted_coverage_ratio)
+        print("An interest coverage ratio of: " + str(coverage_ratio))
     
     except:
         print("We couldn't find that symbol. Please try again with a valid symbol and API Key.")
