@@ -7,73 +7,83 @@ from app.alpha import API_KEY
 from app.overview import fetch_balance_data
 from app.overview import fetch_income_data
 
-symbol = get_symbol()
+def calc_debt_metrics(num_years, balance_sheet_data, income_sheet_data, 
+debt_series, debt_ratios, coverage_ratios, reported_dates,
+form_debt_series, form_debt_ratios, form_coverage_ratios, debt_metrics,
+formatted_debt_metrics):
+    for i in range(0, num_years):
+        shortterm_debt = float(balance_sheet_data['annualReports'][i]['shortTermDebt'])
 
-balance_sheet_data = fetch_balance_data(symbol)
-income_sheet_data = fetch_income_data(symbol)
+        longterm_debt = float(balance_sheet_data['annualReports'][i]['longTermDebtNoncurrent'])
 
+        total_debt = (shortterm_debt + longterm_debt)
 
-debt_series = []
-debt_ratios = []
-coverage_ratios = []
-reported_dates = []
-form_debt_series = []
-form_debt_ratios = []
-form_coverage_ratios = []
+        form_total_debt = str(round((total_debt/1000000000),ndigits= 2)) + ' Billion'
 
-debt_metrics = {'totaldebt': debt_series, 'debtratio': debt_ratios, 'coverageratio': coverage_ratios, 'dates': reported_dates}
-formatted_debt_metrics = {'totaldebt': form_debt_series, 'debtratio': form_debt_ratios, 'coverageratio': form_coverage_ratios, 'dates': reported_dates}
+        debt_series.append(total_debt)
 
-num_years = len(balance_sheet_data['annualReports'])
+        form_debt_series.append(form_total_debt)
 
-for i in range(0, num_years):
-    shortterm_debt = float(balance_sheet_data['annualReports'][i]['shortTermDebt'])
+        total_assets = float(balance_sheet_data['annualReports'][i]['totalAssets'])
 
-    longterm_debt = float(balance_sheet_data['annualReports'][i]['longTermDebtNoncurrent'])
+        debt_ratio = total_debt / total_assets
 
-    total_debt = (shortterm_debt + longterm_debt)
+        form_debt_ratio = round(debt_ratio, ndigits= 2)
 
-    form_total_debt = str(round((total_debt/1000000000),ndigits= 2)) + ' Billion'
+        debt_ratios.append(debt_ratio)
 
-    debt_series.append(total_debt)
+        form_debt_ratios.append(form_debt_ratio)
 
-    form_debt_series.append(form_total_debt)
+        EBIT = float(income_sheet_data['annualReports'][i]['ebit'])
 
-    total_assets = float(balance_sheet_data['annualReports'][i]['totalAssets'])
+        interest_expense = float(income_sheet_data['annualReports'][i]['interestExpense'])
 
-    debt_ratio = total_debt / total_assets
+        coverage_ratio = EBIT / interest_expense
 
-    form_debt_ratio = round(debt_ratio, ndigits= 2)
+        form_coverage_ratio = round(coverage_ratio, ndigits= 2)
 
-    debt_ratios.append(debt_ratio)
+        coverage_ratios.append(coverage_ratio)
 
-    form_debt_ratios.append(form_debt_ratio)
+        form_coverage_ratios.append(form_coverage_ratio)
 
-    EBIT = float(income_sheet_data['annualReports'][i]['ebit'])
+        statements_date = balance_sheet_data['annualReports'][i]['fiscalDateEnding']
 
-    interest_expense = float(income_sheet_data['annualReports'][i]['interestExpense'])
+        reported_dates.append(statements_date)
 
-    coverage_ratio = EBIT / interest_expense
+    return debt_metrics
 
-    form_coverage_ratio = round(coverage_ratio, ndigits= 2)
+if __name__ == "__main__":
+    symbol = get_symbol()
+    balance_sheet_data = fetch_balance_data(symbol)
+    income_sheet_data = fetch_income_data(symbol)
 
-    coverage_ratios.append(coverage_ratio)
+    debt_series = []
+    debt_ratios = []
+    coverage_ratios = []
+    reported_dates = []
+    form_debt_series = []
+    form_debt_ratios = []
+    form_coverage_ratios = []
 
-    form_coverage_ratios.append(form_coverage_ratio)
+    debt_metrics = {'totaldebt': debt_series, 'debtratio': debt_ratios, 'coverageratio': coverage_ratios, 'dates': reported_dates}
+    formatted_debt_metrics = {'totaldebt': form_debt_series, 'debtratio': form_debt_ratios, 'coverageratio': form_coverage_ratios, 'dates': reported_dates}
 
-    statements_date = balance_sheet_data['annualReports'][i]['fiscalDateEnding']
+    num_years = len(balance_sheet_data['annualReports'])
 
-    reported_dates.append(statements_date)
+    total_debt_metrics = calc_debt_metrics(num_years, balance_sheet_data, income_sheet_data, 
+    debt_series, debt_ratios, coverage_ratios, reported_dates,
+    form_debt_series, form_debt_ratios, form_coverage_ratios, debt_metrics,
+    formatted_debt_metrics)
 
-debt_fig = px.line(debt_metrics, x='dates', y='totaldebt', labels={'dates': "Date", 'totaldebt': "Total Debt"})
+    debt_fig = px.line(total_debt_metrics, x='dates', y='totaldebt', labels={'dates': "Date", 'totaldebt': "Total Debt"})
 
-debt_fig.show()
+    debt_fig.show()
 
-debtratio_fig = px.line(debt_metrics, x='dates', y='debtratio', labels={'dates': "Date", 'debtratio': "Debt/Asset Ratio"})
+    debtratio_fig = px.line(total_debt_metrics, x='dates', y='debtratio', labels={'dates': "Date", 'debtratio': "Debt/Asset Ratio"})
 
-debtratio_fig.show()
+    debtratio_fig.show()
 
-interestcov_fig = px.line(debt_metrics, x='dates', y='coverageratio', labels={'dates': "Date", 'coverageratio': "Interest Coverage Ratio"})
+    interestcov_fig = px.line(total_debt_metrics, x='dates', y='coverageratio', labels={'dates': "Date", 'coverageratio': "Interest Coverage Ratio"})
 
-interestcov_fig.show()
+    interestcov_fig.show()
 
