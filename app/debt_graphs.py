@@ -6,19 +6,27 @@ from app.alpha import get_symbol
 from app.alpha import API_KEY
 from app.overview import fetch_balance_data
 from app.overview import fetch_income_data
+from app.overview import format_debt
 
-def calc_debt_metrics(num_years, balance_sheet_data, income_sheet_data, 
+
+def calc_debt_metrics(symbol, num_years, balance_sheet_data, income_sheet_data, 
 debt_series, debt_ratios, coverage_ratios, reported_dates,
 form_debt_series, form_debt_ratios, form_coverage_ratios, debt_metrics,
 formatted_debt_metrics):
     for i in range(0, num_years):
-        shortterm_debt = float(balance_sheet_data['annualReports'][i]['shortTermDebt'])
+        if balance_sheet_data['annualReports'][i]['shortTermDebt'] == 'None':
+            shortterm_debt = 0.0
+        else:
+            shortterm_debt = float(balance_sheet_data['annualReports'][i]['shortTermDebt'])
 
-        longterm_debt = float(balance_sheet_data['annualReports'][i]['longTermDebtNoncurrent'])
+        if balance_sheet_data['annualReports'][i]['longTermDebtNoncurrent'] == 'None':
+            longterm_debt = 0.0
+        else:
+            longterm_debt = float(balance_sheet_data['annualReports'][i]['longTermDebtNoncurrent'])
 
         total_debt = (shortterm_debt + longterm_debt)
 
-        form_total_debt = str(round((total_debt/1000000000),ndigits= 2)) + ' Billion'
+        form_total_debt = format_debt(symbol,balance_sheet_data,total_debt)
 
         debt_series.append(total_debt)
 
@@ -36,7 +44,10 @@ formatted_debt_metrics):
 
         EBIT = float(income_sheet_data['annualReports'][i]['ebit'])
 
-        interest_expense = float(income_sheet_data['annualReports'][i]['interestExpense'])
+        if income_sheet_data['annualReports'][i]['interestExpense'] == 'None':
+            interest_expense = 0.0
+        else:
+            interest_expense = float(income_sheet_data['annualReports'][i]['interestExpense'])
 
         coverage_ratio = EBIT / interest_expense
 
@@ -53,37 +64,39 @@ formatted_debt_metrics):
     return debt_metrics
 
 if __name__ == "__main__":
-    symbol = get_symbol()
-    balance_sheet_data = fetch_balance_data(symbol)
-    income_sheet_data = fetch_income_data(symbol)
+    try:
+        symbol = get_symbol()
+        balance_sheet_data = fetch_balance_data(symbol)
+        income_sheet_data = fetch_income_data(symbol)
 
-    debt_series = []
-    debt_ratios = []
-    coverage_ratios = []
-    reported_dates = []
-    form_debt_series = []
-    form_debt_ratios = []
-    form_coverage_ratios = []
+        debt_series = []
+        debt_ratios = []
+        coverage_ratios = []
+        reported_dates = []
+        form_debt_series = []
+        form_debt_ratios = []
+        form_coverage_ratios = []
 
-    debt_metrics = {'totaldebt': debt_series, 'debtratio': debt_ratios, 'coverageratio': coverage_ratios, 'dates': reported_dates}
-    formatted_debt_metrics = {'totaldebt': form_debt_series, 'debtratio': form_debt_ratios, 'coverageratio': form_coverage_ratios, 'dates': reported_dates}
+        debt_metrics = {'totaldebt': debt_series, 'debtratio': debt_ratios, 'coverageratio': coverage_ratios, 'dates': reported_dates}
+        formatted_debt_metrics = {'totaldebt': form_debt_series, 'debtratio': form_debt_ratios, 'coverageratio': form_coverage_ratios, 'dates': reported_dates}
 
-    num_years = len(balance_sheet_data['annualReports'])
+        num_years = len(balance_sheet_data['annualReports'])
 
-    total_debt_metrics = calc_debt_metrics(num_years, balance_sheet_data, income_sheet_data, 
-    debt_series, debt_ratios, coverage_ratios, reported_dates,
-    form_debt_series, form_debt_ratios, form_coverage_ratios, debt_metrics,
-    formatted_debt_metrics)
+        total_debt_metrics = calc_debt_metrics(num_years, balance_sheet_data, income_sheet_data, 
+        debt_series, debt_ratios, coverage_ratios, reported_dates,
+        form_debt_series, form_debt_ratios, form_coverage_ratios, debt_metrics,
+        formatted_debt_metrics)
 
-    debt_fig = px.line(total_debt_metrics, x='dates', y='totaldebt', labels={'dates': "Date", 'totaldebt': "Total Debt"})
+        debt_fig = px.line(total_debt_metrics, x='dates', y='totaldebt', labels={'dates': "Date", 'totaldebt': "Total Debt"})
 
-    debt_fig.show()
+        debt_fig.show()
 
-    debtratio_fig = px.line(total_debt_metrics, x='dates', y='debtratio', labels={'dates': "Date", 'debtratio': "Debt/Asset Ratio"})
+        debtratio_fig = px.line(total_debt_metrics, x='dates', y='debtratio', labels={'dates': "Date", 'debtratio': "Debt/Asset Ratio"})
 
-    debtratio_fig.show()
+        debtratio_fig.show()
 
-    interestcov_fig = px.line(total_debt_metrics, x='dates', y='coverageratio', labels={'dates': "Date", 'coverageratio': "Interest Coverage Ratio"})
+        interestcov_fig = px.line(total_debt_metrics, x='dates', y='coverageratio', labels={'dates': "Date", 'coverageratio': "Interest Coverage Ratio"})
 
-    interestcov_fig.show()
-
+        interestcov_fig.show()
+    except:
+        print("We couldn't find that symbol. Please try again with a valid symbol and API Key.")

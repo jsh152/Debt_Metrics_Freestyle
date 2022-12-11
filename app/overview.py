@@ -46,7 +46,7 @@ def calc_total_debt(symbol, balance_data):
 
 def format_debt(symbol, balance_data, total_debt):
     total_debt = calc_total_debt(symbol, balance_data)
-    format_total_debt = str(total_debt / 1000000000) + ' Billion'
+    format_total_debt = str(round((total_debt / 1000000000), ndigits= 2)) + ' Billion'
 
     return format_total_debt
 

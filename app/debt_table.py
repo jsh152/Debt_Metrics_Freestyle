@@ -25,30 +25,32 @@ def create_table(total_debt_metrics):
     return debt_table
 
 if __name__ == "__main__":
+    try:
+        symbol = get_symbol()
+        balance_sheet_data = fetch_balance_data(symbol)
+        income_sheet_data = fetch_income_data(symbol)
 
-    symbol = get_symbol()
-    balance_sheet_data = fetch_balance_data(symbol)
-    income_sheet_data = fetch_income_data(symbol)
+        num_years = len(balance_sheet_data['annualReports'])
 
-    num_years = len(balance_sheet_data['annualReports'])
+        debt_series = []
+        debt_ratios = []
+        coverage_ratios = []
+        reported_dates = []
+        form_debt_series = []
+        form_debt_ratios = []
+        form_coverage_ratios = []
 
-    debt_series = []
-    debt_ratios = []
-    coverage_ratios = []
-    reported_dates = []
-    form_debt_series = []
-    form_debt_ratios = []
-    form_coverage_ratios = []
+        debt_metrics = {'totaldebt': debt_series, 'debtratio': debt_ratios, 'coverageratio': coverage_ratios, 'dates': reported_dates}
+        formatted_debt_metrics = {'totaldebt': form_debt_series, 'debtratio': form_debt_ratios, 'coverageratio': form_coverage_ratios, 'dates': reported_dates}
 
-    debt_metrics = {'totaldebt': debt_series, 'debtratio': debt_ratios, 'coverageratio': coverage_ratios, 'dates': reported_dates}
-    formatted_debt_metrics = {'totaldebt': form_debt_series, 'debtratio': form_debt_ratios, 'coverageratio': form_coverage_ratios, 'dates': reported_dates}
+        total_debt_metrics = calc_debt_metrics(symbol, num_years, balance_sheet_data, income_sheet_data, 
+        debt_series, debt_ratios, coverage_ratios, reported_dates,
+        form_debt_series, form_debt_ratios, form_coverage_ratios, debt_metrics,
+        formatted_debt_metrics)
 
-    total_debt_metrics = calc_debt_metrics(num_years, balance_sheet_data, income_sheet_data, 
-    debt_series, debt_ratios, coverage_ratios, reported_dates,
-    form_debt_series, form_debt_ratios, form_coverage_ratios, debt_metrics,
-    formatted_debt_metrics)
-
-    table = create_table(total_debt_metrics)
-    
-    table.show()
+        table = create_table(total_debt_metrics)
+        
+        table.show()
+    except:
+        print("We couldn't find that symbol. Please try again with a valid symbol and API Key.")
 
