@@ -45,8 +45,7 @@ if __name__ == "__main__":
 
         total_debt_metrics = calc_debt_metrics(symbol, num_years, balance_sheet_data, income_sheet_data, 
         debt_series, debt_ratios, coverage_ratios, reported_dates,
-        form_debt_series, form_debt_ratios, form_coverage_ratios, debt_metrics,
-        formatted_debt_metrics)
+        form_debt_series, form_debt_ratios, form_coverage_ratios, debt_metrics)
 
         table = create_table(total_debt_metrics)
         

@@ -11,8 +11,7 @@ from app.overview import format_debt
 
 def calc_debt_metrics(symbol, num_years, balance_sheet_data, income_sheet_data, 
 debt_series, debt_ratios, coverage_ratios, reported_dates,
-form_debt_series, form_debt_ratios, form_coverage_ratios, debt_metrics,
-formatted_debt_metrics):
+form_debt_series, form_debt_ratios, form_coverage_ratios, debt_metrics):
     for i in range(0, num_years):
         if balance_sheet_data['annualReports'][i]['shortTermDebt'] == 'None':
             shortterm_debt = 0.0
@@ -82,10 +81,9 @@ if __name__ == "__main__":
 
         num_years = len(balance_sheet_data['annualReports'])
 
-        total_debt_metrics = calc_debt_metrics(num_years, balance_sheet_data, income_sheet_data, 
+        total_debt_metrics = calc_debt_metrics(symbol, num_years, balance_sheet_data, income_sheet_data, 
         debt_series, debt_ratios, coverage_ratios, reported_dates,
-        form_debt_series, form_debt_ratios, form_coverage_ratios, debt_metrics,
-        formatted_debt_metrics)
+        form_debt_series, form_debt_ratios, form_coverage_ratios, debt_metrics)
 
         debt_fig = px.line(total_debt_metrics, x='dates', y='totaldebt', labels={'dates': "Date", 'totaldebt': "Total Debt"})
 

@@ -10,6 +10,22 @@ from app.overview import calc_debt_ratio
 from app.overview import calc_coverage_ratio
 from app.overview import format_debt
 
+comp_symbols = []
+comp_values_diff = []
+comp_industry = []
+comp_marketcap = []
+comparable_companies = {'Symbols': comp_symbols, 'MarketCapDiff': comp_values_diff, 'Industry': comp_industry, 'MarketCap': comp_marketcap}
+true_comp_symbols = []
+true_comp_values = []
+true_comps = {'Symbols': true_comp_symbols, 'MarketCap': true_comp_values}
+comp_total_debt = []
+comp_debt_ratio = []
+comp_coverage_ratio = []
+comp_debt_symbols = []
+comp_debt_metrics = {'Companies': comp_debt_symbols, 'TotalDebt': comp_total_debt,
+'DebtRatio': comp_debt_ratio, 'CoverageRatio': comp_coverage_ratio }
+
+
 #I have the list of industries and listed stocks stored in a csv file, this function accesses that data
 def get_csv_url():
     industry_csv_url = 'https://github.com/jsh152/Debt_Metrics_Freestyle/raw/main/industries.csv'
@@ -80,7 +96,6 @@ def create_comps_table(comparable_metrics, comp_debt_symbols, comp_total_debt, c
     comp_debt_table.update_layout(title_text= 'Comparable Companies')
     return comp_debt_table
 
-
 if __name__ == "__main__":    
     try:
         industry_csv_data = get_csv_url()
@@ -94,14 +109,8 @@ if __name__ == "__main__":
                 stock_industry = industry_csv_data['Industry'][k]
                 k_value = k
 
-        comp_symbols = []
-        comp_values_diff = []
-        comp_industry = []
-        comp_marketcap = []
-        comparable_companies = {'Symbols': comp_symbols, 'MarketCapDiff': comp_values_diff, 'Industry': comp_industry, 'MarketCap': comp_marketcap}
-
         industry_participants = get_industry_companies(num_stocks, industry_csv_data, stock_industry, comp_symbols, comp_industry, comp_marketcap, comp_values_diff, comparable_companies)
-
+        print(type(industry_participants))
         #Determine if the selected company has multiple series of publicly traded shares
         num_series_stock = comp_values_diff.count(0.0)
 
@@ -118,21 +127,8 @@ if __name__ == "__main__":
 
         #Declare lists included in the final dictionary. Have the first entry of the comparable companies list be the selected company
         true_comp_symbols = [input_symbol]
-        true_comp_values = []
-
-        true_comps = {'Symbols': true_comp_symbols, 'MarketCap': true_comp_values,
-        'Industry': [comp_industry[0], comp_industry[1], comp_industry[2], comp_industry[3], comp_industry[4]]}
-
+        
         true_comparables = get_comparable_companies(num_series_stock, num_comparables, comparable_companies, dupl_comp_values_diff, true_comps)
-
-        #Now that we have a dictionary with our comparable companies, we need to declare lists to fetch debt metrics for each
-        comp_total_debt = []
-        comp_debt_ratio = []
-        comp_coverage_ratio = []
-        comp_debt_symbols = []
-
-        comp_debt_metrics = {'Companies': comp_debt_symbols, 'TotalDebt': comp_total_debt,
-        'DebtRatio': comp_debt_ratio, 'CoverageRatio': comp_coverage_ratio }
 
         comparable_metrics = get_comps_metrics(true_comp_symbols, comp_debt_metrics)
 

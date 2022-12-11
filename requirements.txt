@@ -7,3 +7,5 @@ requests
 plotly
 
 python-dotenv
+
+pytest
