@@ -33,9 +33,13 @@ API_KEY="{Insert API Key here}"
 
 ## Usage
 There are 4 different programs that the user can run from the command line:
+
     1. 'overview': Displays the current debt metrics for a chosen company
+
     2. 'debt_graphs': Displays graphs depicting how debt metrics for chosen company have changed over the past 5 years
-    3. 'debt_table': Displays a table depicting how debt metrics for chosen company have changed over the past 5 yeras
+
+    3. 'debt_table': Displays a table depicting how debt metrics for chosen company have changed over the past 5 years
+    
     4. 'comparables': Displays a table depicting current debt metrics for chosen company and 3 comparable companies
 
 
