@@ -106,6 +106,6 @@ if __name__ == "__main__":
 
         interestcov_fig.show()
     
-    #If the user inputs and invalid stock symbol or has an invalid api key, redirect them to try again
+    #If user inputs and invalid stock symbol or has an invalid api key, redirect them to try again
     except:
         print("We couldn't find that symbol. Please try again with a valid symbol and API Key.")
