@@ -8,7 +8,8 @@ from app.debt_graphs import calc_debt_metrics
 
 from app.debt_graphs import debt_series, debt_ratios, coverage_ratios, reported_dates, form_debt_series, form_debt_ratios, form_coverage_ratios 
 from app.debt_graphs import debt_metrics, formatted_debt_metrics
-       
+
+#Create a table showing the debt metrics over time for a user's company of choice
 def create_table():
     debt_table = go.Figure(data=[go.Table(
         header=dict(values=['total_debt_metrics',debt_metrics['dates'][0],debt_metrics['dates'][1],debt_metrics['dates'][2],debt_metrics['dates'][3],debt_metrics['dates'][4]],
@@ -29,19 +30,27 @@ def create_table():
 
 if __name__ == "__main__":
     try:
+        #Run functions to get symbol and balance/income sheet data
         symbol = get_symbol()
         balance_sheet_data = fetch_balance_data(symbol)
         income_sheet_data = fetch_income_data(symbol)
 
+        #Number of years of reported data
         num_years = len(balance_sheet_data['annualReports'])
 
+        #Run the function imported form the debt_graphs program to generate the dictionary containing debt metrics over time
         total_debt_metrics = calc_debt_metrics(symbol, num_years, balance_sheet_data, income_sheet_data, 
         debt_series, debt_ratios, coverage_ratios, reported_dates,
         form_debt_series, form_debt_ratios, form_coverage_ratios, debt_metrics)
 
+        #Run the function to create the debt metrics table
         table = create_table()
 
+
+        #Display the table
         table.show()
+    
+    #If the user inputs and invalid stock symbol or has an invalid api key, redirect them to try again
     except:
         print("We couldn't find that symbol. Please try again with a valid symbol and API Key.")
 

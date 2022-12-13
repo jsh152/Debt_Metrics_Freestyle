@@ -7,6 +7,7 @@ from app.alpha import API_KEY
 from app.overview import fetch_balance_data
 from app.overview import fetch_income_data
 
+#Declare lists and dictionaries that will be used in the following function
 debt_series = []
 debt_ratios = []
 coverage_ratios = []
@@ -17,6 +18,7 @@ form_coverage_ratios = []
 debt_metrics = {'totaldebt': debt_series, 'debtratio': debt_ratios, 'coverageratio': coverage_ratios, 'dates': reported_dates}
 formatted_debt_metrics = {'totaldebt': form_debt_series, 'debtratio': form_debt_ratios, 'coverageratio': form_coverage_ratios, 'dates': reported_dates}
 
+#Calculate debt metrics (total debt, debt/asset ratio, coverage ratio) for the user inputted company over past 5 years
 def calc_debt_metrics(symbol, num_years, balance_sheet_data, income_sheet_data, 
 debt_series, debt_ratios, coverage_ratios, reported_dates,
 form_debt_series, form_debt_ratios, form_coverage_ratios, debt_metrics):
@@ -72,16 +74,20 @@ form_debt_series, form_debt_ratios, form_coverage_ratios, debt_metrics):
 
 if __name__ == "__main__":
     try:
+        #Run functions to get symbol and balance/income sheet data
         symbol = get_symbol()
         balance_sheet_data = fetch_balance_data(symbol)
         income_sheet_data = fetch_income_data(symbol)
 
+        #Number of years tracked
         num_years = len(balance_sheet_data['annualReports'])
 
+        #Run the function to calculate debt metrics over time
         total_debt_metrics = calc_debt_metrics(symbol, num_years, balance_sheet_data, income_sheet_data, 
         debt_series, debt_ratios, coverage_ratios, reported_dates,
         form_debt_series, form_debt_ratios, form_coverage_ratios, debt_metrics)
 
+        #Create and display the graphs using dictionary containing debt metrics over time
         debt_fig = px.line(total_debt_metrics, x='dates', y='totaldebt', labels={'dates': "Date", 'totaldebt': "Total Debt"})
 
         debt_fig.update_layout(title_text= symbol.upper())
@@ -99,5 +105,7 @@ if __name__ == "__main__":
         interestcov_fig.update_layout(title_text= symbol.upper())
 
         interestcov_fig.show()
+    
+    #If the user inputs and invalid stock symbol or has an invalid api key, redirect them to try again
     except:
         print("We couldn't find that symbol. Please try again with a valid symbol and API Key.")

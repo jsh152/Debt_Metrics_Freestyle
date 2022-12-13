@@ -10,6 +10,7 @@ from app.overview import calc_debt_ratio
 from app.overview import calc_coverage_ratio
 from app.overview import format_debt
 
+#Declare lists and dictionaries that will be used in the following functions
 comp_symbols = []
 comp_values_diff = []
 comp_industry = []
@@ -98,9 +99,11 @@ def create_comps_table(comparable_metrics, comp_debt_symbols, comp_total_debt, c
 
 if __name__ == "__main__":    
     try:
+        #Run the functions to get the csv url and the user stock symbol
         industry_csv_data = get_csv_url()
         symbol = get_symbol()
 
+        #Counter variable will count up to the number of companies in the csv file
         num_stocks = len(industry_csv_data)
 
         #Search the industry CSV file to find the industry that the user inputted stock is in
@@ -109,8 +112,10 @@ if __name__ == "__main__":
                 stock_industry = industry_csv_data['Industry'][k]
                 k_value = k
 
+        #Run the function to get the companies in the same industry as user choice company
         industry_participants = get_industry_companies(num_stocks, k_value, industry_csv_data, stock_industry, comp_symbols, comp_industry, comp_marketcap, comp_values_diff, comparable_companies)
         print(type(industry_participants))
+
         #Determine if the selected company has multiple series of publicly traded shares
         num_series_stock = comp_values_diff.count(0.0)
 
@@ -123,17 +128,24 @@ if __name__ == "__main__":
         #Number of companies in the same industry
         num_comparables = len(comp_symbols)
 
+        #This symbol will be displayed on the output graph, so have it uppercase for presentation
         input_symbol = symbol.upper()
 
         #Declare lists included in the final dictionary. Have the first entry of the comparable companies list be the selected company
         true_comp_symbols = [input_symbol]
         
+        #Run function to get short list of comparable companies
         true_comparables = get_comparable_companies(num_series_stock, num_comparables, comparable_companies, dupl_comp_values_diff, true_comps)
 
+        #Run function to get the debt metrics for each comparable company
         comparable_metrics = get_comps_metrics(true_comp_symbols, comp_debt_metrics)
 
+        #Run the function to create the comparable output table
         comparable_table = create_comps_table(comparable_metrics, comp_debt_symbols, comp_total_debt, comp_debt_ratio, comp_coverage_ratio)
 
+        #Show the table to the end user
         comparable_table.show()
+
+    #If the user inputs and invalid stock symbol or has an invalid api key, redirect them to try again
     except:
         print("We couldn't find that symbol. Please try again with a valid symbol and API Key.")

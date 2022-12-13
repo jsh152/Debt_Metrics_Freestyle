@@ -5,6 +5,7 @@ import json
 from app.alpha import get_symbol
 from app.alpha import API_KEY
 
+#Fetch balance sheet data from alphavantage using user's inputted symbol
 def fetch_balance_data(symbol):
     
     balance_url = f"https://www.alphavantage.co/query?function=BALANCE_SHEET&symbol={symbol}&apikey={API_KEY}"
@@ -15,7 +16,7 @@ def fetch_balance_data(symbol):
 
     return parsed_balance_data
 
-
+#Fetch income statement data from alphavantage using user's inputted symbol
 def fetch_income_data(symbol):
 
     income_url = f"https://www.alphavantage.co/query?function=INCOME_STATEMENT&symbol={symbol}&apikey={API_KEY}"
@@ -26,6 +27,7 @@ def fetch_income_data(symbol):
 
     return parsed_income_data
 
+#Calculate current total debt for the user's company of choice
 def calc_total_debt(symbol, balance_data):
 
     if balance_data['annualReports'][0]['shortTermDebt'] == 'None':
@@ -42,13 +44,14 @@ def calc_total_debt(symbol, balance_data):
 
     return total_debt_amt
 
-
+#Format the total debt amount to be displayed as "x.xx Billion"
 def format_debt(symbol, balance_data, total_debt):
     total_debt = calc_total_debt(symbol, balance_data)
     format_total_debt = str(round((total_debt / 1000000000), ndigits= 2)) + ' Billion'
 
     return format_total_debt
 
+#Calculate the current debt/asset ratio for company of choice
 def calc_debt_ratio(symbol, balance_data, total_debt):
     total_debt = calc_total_debt(symbol, balance_data)
     
@@ -62,6 +65,7 @@ def calc_debt_ratio(symbol, balance_data, total_debt):
 
     return form_debt_asset_ratio
 
+#Calculate the interest coverage ratio for the company of choice
 def calc_coverage_ratio(symbol,income_data ):
     EBIT = float(income_data['annualReports'][0]['ebit'])
 
@@ -79,6 +83,7 @@ def calc_coverage_ratio(symbol,income_data ):
 
 if __name__ == "__main__":
     try:
+        #Run all functions
         symbol = get_symbol()
         income_data = fetch_income_data(symbol)
         balance_data = fetch_balance_data(symbol)
@@ -87,8 +92,10 @@ if __name__ == "__main__":
         debt_ratio = calc_debt_ratio(symbol, balance_data, total_debt)
         coverage_ratio = calc_coverage_ratio(symbol, income_data)
 
+        #The date of each balance sheet/income statement report
         statements_date = balance_data['annualReports'][0]['fiscalDateEnding']
 
+        #Print output for user
         print('')
 
         print("As of " + statements_date + " " + symbol + " has:")
@@ -101,5 +108,6 @@ if __name__ == "__main__":
 
         print("An interest coverage ratio of: " + str(coverage_ratio))
     
+    #If the user inputs and invalid stock symbol or has an invalid api key, redirect them to try again
     except:
         print("We couldn't find that symbol. Please try again with a valid symbol and API Key.")
