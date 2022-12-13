@@ -1,6 +1,5 @@
 #This is the overview file. Here, basic debt metrics will be presented abou the company at a glance
 
-
 import requests
 import json
 from app.alpha import get_symbol

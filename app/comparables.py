@@ -36,7 +36,7 @@ def get_csv_url():
 
 #Create a dictionary filled with all of the companies in the selected company's industry and the difference in value between
 #each and the selected company
-def get_industry_companies(num_stocks, industry_csv_data, stock_industry, comp_symbols, comp_industry, comp_marketcap, comp_values_diff, comparable_companies):
+def get_industry_companies(num_stocks, k_value, industry_csv_data, stock_industry, comp_symbols, comp_industry, comp_marketcap, comp_values_diff, comparable_companies):
     for j in range(0,num_stocks):
         if industry_csv_data['Industry'][j] == stock_industry:
             comp_symbols.append(industry_csv_data['Symbol'][j])
@@ -109,7 +109,7 @@ if __name__ == "__main__":
                 stock_industry = industry_csv_data['Industry'][k]
                 k_value = k
 
-        industry_participants = get_industry_companies(num_stocks, industry_csv_data, stock_industry, comp_symbols, comp_industry, comp_marketcap, comp_values_diff, comparable_companies)
+        industry_participants = get_industry_companies(num_stocks, k_value, industry_csv_data, stock_industry, comp_symbols, comp_industry, comp_marketcap, comp_values_diff, comparable_companies)
         print(type(industry_participants))
         #Determine if the selected company has multiple series of publicly traded shares
         num_series_stock = comp_values_diff.count(0.0)

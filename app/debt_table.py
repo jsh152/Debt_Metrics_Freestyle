@@ -6,7 +6,10 @@ from app.overview import fetch_balance_data
 from app.overview import fetch_income_data
 from app.debt_graphs import calc_debt_metrics
 
-def create_table(total_debt_metrics):
+from app.debt_graphs import debt_series, debt_ratios, coverage_ratios, reported_dates, form_debt_series, form_debt_ratios, form_coverage_ratios 
+from app.debt_graphs import debt_metrics, formatted_debt_metrics
+       
+def create_table():
     debt_table = go.Figure(data=[go.Table(
         header=dict(values=['total_debt_metrics',debt_metrics['dates'][0],debt_metrics['dates'][1],debt_metrics['dates'][2],debt_metrics['dates'][3],debt_metrics['dates'][4]],
                     fill_color='navy', font=dict(color='white', size=12.25),
@@ -32,23 +35,12 @@ if __name__ == "__main__":
 
         num_years = len(balance_sheet_data['annualReports'])
 
-        debt_series = []
-        debt_ratios = []
-        coverage_ratios = []
-        reported_dates = []
-        form_debt_series = []
-        form_debt_ratios = []
-        form_coverage_ratios = []
-
-        debt_metrics = {'totaldebt': debt_series, 'debtratio': debt_ratios, 'coverageratio': coverage_ratios, 'dates': reported_dates}
-        formatted_debt_metrics = {'totaldebt': form_debt_series, 'debtratio': form_debt_ratios, 'coverageratio': form_coverage_ratios, 'dates': reported_dates}
-
         total_debt_metrics = calc_debt_metrics(symbol, num_years, balance_sheet_data, income_sheet_data, 
         debt_series, debt_ratios, coverage_ratios, reported_dates,
         form_debt_series, form_debt_ratios, form_coverage_ratios, debt_metrics)
 
-        table = create_table(total_debt_metrics)
-        
+        table = create_table()
+
         table.show()
     except:
         print("We couldn't find that symbol. Please try again with a valid symbol and API Key.")
